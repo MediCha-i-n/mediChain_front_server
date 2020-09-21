@@ -14,6 +14,7 @@ def create_app():
     # ORM
     db.init_app(app)
     migrate.init_app(app, db)
+    from . import model
 
     # Blueprints
     from .views import main_views
