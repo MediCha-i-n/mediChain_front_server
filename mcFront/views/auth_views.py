@@ -1,10 +1,12 @@
-from flask import Blueprint, url_for, render_template, flash, request, session
+from flask import Blueprint, url_for, render_template, flash, request, session, g
 from werkzeug.security import generate_password_hash, check_password_hash
 from werkzeug.utils import redirect
 
 from mcFront import db
 from mcFront.forms import PatientUserCreateForm, DoctorUserCreateForm, PatientUserLoginForm, DoctorUserLoginForm
 from mcFront.model import Patient, Doctor
+
+import functools
 
 bp = Blueprint('auth', __name__, url_prefix='/auth')
 
@@ -20,7 +22,7 @@ def signup():
             db.session.commit()
             return redirect(url_for('main.index'))
         else:
-            flash('이미 존재하는 사용자입니다.')
+            flash('이미 존재하는 사용자 정보입니다.')
     return render_template('auth/signup.html', form=form)
 
 @bp.route('/docSignup/', methods=('GET', 'POST'))
@@ -36,7 +38,7 @@ def docSignup():
             db.session.commit()
             return redirect(url_for('main.index'))
         else:
-            flash('이미 존재하는 사용자입니다.')
+            flash('이미 존재하는 사용자 정보입니다.')
     return render_template('auth/docSignup.html', form=form)
 
 @bp.route('/login/', methods=('GET', 'POST'))
@@ -51,7 +53,8 @@ def login():
             error = "틀린 비밀번호입니다."
         if error is None:
             session.clear()
-            session['patient_id'] = patientUser.id
+            session['user_id'] = patientUser.id
+            session['doc_auth'] = 0
             return redirect(url_for('main.index'))
         flash(error)
     return render_template('auth/login.html', form=form)
@@ -68,7 +71,42 @@ def docLogin():
             error = "틀린 비밀번호입니다."
         if error is None:
             session.clear()
-            session['doctor_id'] = doctorUser.id
+            session['user_id'] = doctorUser.id
+            session['doc_auth'] = 1
             return redirect(url_for('main.index'))
         flash(error)
     return render_template('auth/docLogin.html', form=form)
+
+@bp.route('/logout/')
+def logout():
+    session.clear()
+    return redirect(url_for('main.index'))
+
+@bp.before_app_request
+def load_logged_in_user():
+    user_id = session.get('user_id')
+    if user_id is None:
+        g.user = None
+    else:
+        doc_auth = session.get('doc_auth')
+        if doc_auth:
+            g.user = Doctor.query.get(user_id)
+        else:
+            g.user = Patient.query.get(user_id)
+
+def login_required(view):
+    @functools.wraps(view)
+    def wrapped_view(**kwargs):
+        if g.user is None:
+            return redirect(url_for('main.index'))
+        return view(**kwargs)
+    return wrapped_view
+
+def docLogin_required(view):
+    @functools.wraps(view)
+    def wrapped_view(**kwargs):
+        if g.user is None or not g.user.docAuth:
+            return redirect(url_for('auth.docLogin'))
+        return view(**kwargs)
+    return wrapped_view
+
