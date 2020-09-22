@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container my-3">
+    <a href="{{ url_for('auth.login') }}" class="btn btn-primary">환자 로그인</a>
+</div>
+<div class="container my-3">
+    <a href="{{ url_for('auth.signup') }}" class="btn btn-primary">환자 계정생성</a>
+</div>
+<div class="container my-3">
+    <a href="{{ url_for('auth.docLogin') }}" class="btn btn-primary">의료인 로그인</a>
+</div>
+<div class="container my-3">
+    <a href="{{ url_for('auth.docSignup') }}" class="btn btn-primary">의료인 계정생성</a>
+</div>
+{% endblock %}
