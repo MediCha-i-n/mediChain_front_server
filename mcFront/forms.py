@@ -24,3 +24,9 @@ class PatientUserLoginForm(FlaskForm):
 class DoctorUserLoginForm(FlaskForm):
     doctorName = StringField('사용자 이름', validators=[DataRequired(), Length(min=2, max=50)])
     password = PasswordField('비밀번호', validators=[DataRequired()])
+
+class ActUploadForm(FlaskForm):
+    image = StringField('image', validators=[DataRequired()])
+
+class ActSearchForm(FlaskForm):
+    hash = StringField('hash', validators=[DataRequired()])

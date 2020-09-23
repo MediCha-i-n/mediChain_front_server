@@ -55,7 +55,7 @@ def login():
             session.clear()
             session['user_id'] = patientUser.id
             session['doc_auth'] = 0
-            return redirect(url_for('main.index'))
+            return redirect(url_for('main.patientMain'))
         flash(error)
     return render_template('auth/login.html', form=form)
 
@@ -73,7 +73,7 @@ def docLogin():
             session.clear()
             session['user_id'] = doctorUser.id
             session['doc_auth'] = 1
-            return redirect(url_for('main.index'))
+            return redirect(url_for('main.docMain'))
         flash(error)
     return render_template('auth/docLogin.html', form=form)
 
@@ -98,7 +98,7 @@ def login_required(view):
     @functools.wraps(view)
     def wrapped_view(**kwargs):
         if g.user is None:
-            return redirect(url_for('main.index'))
+            return redirect(url_for('auth.login'))
         return view(**kwargs)
     return wrapped_view
 

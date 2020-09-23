@@ -1,16 +1,9 @@
 {% extends 'base.html' %}
 {% block content %}
 <div class="container my-3">
-    <form action="{{ url_for('act.upload', image=image) }}" method="post">
-        <input type="file" name="image" id="image" accept="image/*">
-        <input type="submit" value="업로드">
-    </form>
+    <a href="{{ url_for('act.search') }}" class="btn btn-primary">조회</a>
 </div>
-
 <div class="container my-3">
-    <form action="{{ url_for('act.search', hash=hash) }}" method="post">
-        <input type="text" name="hash" id="hash">
-        <input type="submit" value="조회">
-    </form>
+    <a href="{{ url_for('act.upload') }}" class="btn btn-primary">이미지 업로드</a>
 </div>
 {% endblock %}

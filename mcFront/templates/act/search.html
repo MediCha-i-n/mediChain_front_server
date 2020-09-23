@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container">
+    <h5 class="my-3 border-bottom pb-2">이미지 조회</h5>
+    <form method="post" class="post-form my-3">
+        {{ form.csrf_token }}
+        <div class="form-group">
+            <label for="hash">해쉬</label>
+            <input type="text" class="form-control" name="hash" id="hash"
+                    value="{{ form.hash.data or '' }}">
+        </div>
+        <button type="submit" class="btn btn-primary">조회하기</button>
+    </form>
+</div>
+{% endblock %}

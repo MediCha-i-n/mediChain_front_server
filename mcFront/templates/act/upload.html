@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container">
+    <h5 class="my-3 border-bottom pb-2">이미지 업로드</h5>
+    <form method="post" enctype="multipart/form-data" class="post-form my-3">
+        {{ form.csrf_token }}
+        <div class="form-group">
+            <label for="image">이미지</label>
+            <input type="file" class="form-control" name="image" id="image">
+        </div>
+        <button type="submit" class="btn btn-primary">업로드하기</button>
+    </form>
+</div>
+{% endblock %}
