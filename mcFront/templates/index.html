@@ -1,15 +1,22 @@
 {% extends 'base.html' %}
 {% block content %}
-<div class="container my-3">
-    <a href="{{ url_for('auth.login') }}" class="btn btn-primary">환자 로그인</a>
-</div>
-<div class="container my-3">
-    <a href="{{ url_for('auth.signup') }}" class="btn btn-primary">환자 계정생성</a>
-</div>
-<div class="container my-3">
-    <a href="{{ url_for('auth.docLogin') }}" class="btn btn-primary">의료인 로그인</a>
-</div>
-<div class="container my-3">
-    <a href="{{ url_for('auth.docSignup') }}" class="btn btn-primary">의료인 계정생성</a>
+<div class="container" style="width: 100%" align="center">
+    <div class="span10" style="width: 100%">
+        <div class="pricing-header px-3 py-3 py-md-5 pb-md-4 mx-auto text-center">
+            <h1 class="display-3">MediChain</h1>
+        </div>
+    </div>
+    <p></p>
+    <div class="row-fluid" style="width: 100%">
+        <div class="span6">
+            <p><a href="{{ url_for('auth.login') }}" class="btn btn-info">환자 로그인</a></p>
+            <p><a href="{{ url_for('auth.signup') }}" class="btn btn-info">환자 계정생성</a></p>
+        </div>
+        <div class="span6">
+            <p><a href="{{ url_for('auth.docLogin') }}" class="btn btn-primary">의료인 로그인</a></p>
+            <p><a href="{{ url_for('auth.docSignup') }}" class="btn btn-primary">의료인 계정생성</a></p>
+        </div>
+    </div>
 </div>
 {% endblock %}
+

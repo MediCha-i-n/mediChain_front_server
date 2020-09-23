@@ -4,16 +4,26 @@
     <!--Required meta tags-->
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <style type="text/css">
+        body {
+            padding-bottom: 40px;
+        }
+    </style>
     <!-- Bootstrap CSS -->
-    <link rel="stylesheet" href="{{ url_for('static', filename='bootstrap.min.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='bootstrap.css') }}">
     <!-- mediChain CSS -->
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
     <title>MediChain</title>
 </head>
 <body>
+{% include "navbar.html" %}
 <!-- 기본 템플릿 안에 삽입될 내용 start -->
 {% block content %}
 {% endblock %}
 <!-- 기본 템플릿 안에 삽입될 내용 End -->
+<!-- jQuery JS -->
+<script src="{{ url_for('static', filename='jquery-3.5.1.min.js') }}"></script>
+<!-- Bootstrap JS -->
+<script src="{{ url_for('static', filename='bootstrap.min.js') }}"></script>
 </body>
 </html>
