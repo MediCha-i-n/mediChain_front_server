@@ -1,6 +1,8 @@
 from flask import Blueprint, request, render_template, url_for, g
 from werkzeug.utils import redirect
+from werkzeug.datastructures import FileStorage
 import subprocess
+import base64
 
 from mcFront import db
 from mcFront.model import Patient, Doctor
@@ -15,7 +17,8 @@ def search():
     form = ActSearchForm()
     if request.method == 'POST' and form.validate_on_submit():
         hash = form.hash.data
-        return hash
+        print(hash)
+        # return hash
     return render_template('act/search.html', form=form)
 
 @bp.route('/upload/', methods=('GET','POST'))
@@ -24,8 +27,9 @@ def upload():
     form = ActUploadForm()
     if request.method == 'POST' and form.validate_on_submit():
         image = form.image.data
-        print(image)
+        # image_length = image.content_length   #   This is 0.
+        image_file = image.read()
+        encoded_file = base64.b64encode(image_file)
 
-        # return image
     return render_template('act/upload.html', form=form)
 

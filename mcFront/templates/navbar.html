@@ -5,17 +5,17 @@
         aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
     </button>
-    <div class="collapse navbar-collapse flex-grow-0" id="navbarNav">
-        <ul class="navbar-nav">
-            <li class="nav-item ">
+    <div class="collapse navbar-collapse flex-grow-0 navbar-light bg-light" id="navbarNav">
+        <ul class="navbar-nav mr-auto">
+            <li class="nav-item">
                 <a class="nav-link text-dark" href="{{ url_for('main.patientMain') }}">비의료진용 화면</a>
             </li>
-            <li class="nav-item ">
+            <li class="nav-item">
                 <a class="nav-link text-dark" href="{{ url_for('main.docMain') }}">의료진용 화면</a>
             </li>
-            <li class="nav-item ">
-                <a class="nav-link" href="{{ url_for('auth.logout') }}">로그아웃</a>
-            </li>
         </ul>
+        <div class="d-flex justify-content-end align-items-center">
+            <a class="nav-link" href="{{ url_for('auth.logout') }}">로그아웃</a>
+        </div>
     </div>
 </nav>
