@@ -1,8 +1,11 @@
-from flask import Blueprint, request, render_template, url_for, g
+from flask import Blueprint, request, render_template, url_for, g, flash
 from werkzeug.utils import redirect
 from werkzeug.datastructures import FileStorage
 import subprocess
 import base64
+import requests
+import time
+import json
 
 from mcFront import db
 from mcFront.model import Patient, Doctor
@@ -15,10 +18,86 @@ bp = Blueprint('act', __name__, url_prefix='/act')
 @login_required
 def search():
     form = ActSearchForm()
+    error = None
     if request.method == 'POST' and form.validate_on_submit():
-        hash = form.hash.data
-        print(hash)
-        # return hash
+        patientHash = form.hash.data
+        if g.user.docAuth or g.user.patientHash == patientHash:
+            apiURL = ''
+            if g.user.docAuth:
+                apiURL = 'http://117.16.137.75:3000/doctor/getPatientData/trainer'
+            else:
+                apiURL = 'http://117.16.137.75:3000/patient/getMyData/trainer'
+            params = {'patientHash': patientHash}
+            # response = requests.get(apiURL, params=params)
+
+##################################################################################################################
+##################################################################################################################
+
+            response = '''[
+             {
+                "TxId": "dd6d392f350e74a027fed8fdf68e88802dea590ec6db33990ca7e423ba594c51",
+                "Timestamp": {
+                    "seconds": { "low": 1600792773, "high": 0, "unsigned": "false" },
+                    "nanos": 449000000
+                },
+                "Value": {
+                    "doctorNumber": "0",
+                    "enrollNumber": 179,
+                    "patientHash": "trainer 3",
+                    "rawImgCID": "bafybeihpi4cthvkkh7x6oy3ozxo3x6w46iyazn5u4wrxjiy2twxywkraly",
+                    "resultImgCID": "bafybeihpi4cthvkkh7x6oy3ozxo3x6w46iyazn5u4wrxjiy2twxywkraly"
+                }
+              },
+              {
+                "Timestamp": {
+                    "seconds": { "low": 1600792890, "high": 0, "unsigned": "false" },
+                    "nanos": 449000000
+                },
+                "Value": {
+                  "doctorID": "doctor",
+                  "enrollNumber": 2,
+                  "patientHash": "patientHash1",
+                  "rawImgCID": "bafybeihpi4cthvkkh7x6oy3ozxo3x6w46iyazn5u4wrxjiy2twxywkraly",
+                  "resultImgCID": "bafybeihpi4cthvkkh7x6oy3ozxo3x6w46iyazn5u4wrxjiy2twxywkraly"
+                }
+              },
+              {
+                "Timestamp": {
+                    "seconds": { "low": 1608799999, "high": 0, "unsigned": "false" },
+                    "nanos": 449000000
+                },
+                "Value": {
+                  "patientHash": "patientHash1",
+                  "enrollNumber": 1,
+                  "doctorID": "doctor",
+                  "rawImgCID": "bafybeihpi4cthvkkh7x6oy3ozxo3x6w46iyazn5u4wrxjiy2twxywkraly",
+                  "resultImgCID": "bafybeihpi4cthvkkh7x6oy3ozxo3x6w46iyazn5u4wrxjiy2twxywkraly"
+                }
+              }
+            ]
+            '''
+
+##################################################################################################################
+##################################################################################################################
+
+            data_list = []
+            res = sorted(json.loads(response), key=lambda x: -(x['Timestamp']['seconds']['low']))
+            for each_data in res:
+                tm = time.localtime(each_data['Timestamp']['seconds']['low'])
+                # time_data = {'year': tm.tm_year, 'month': tm.tm_mon, 'day': tm.tm_mday, 'hour': tm.tm_hour,
+                #              'minute': tm.tm_min}
+                time_data = str(tm.tm_year) + '.' + str(tm.tm_mon) + '.' + str(tm.tm_mday) + ' / ' + str(tm.tm_hour) + ':' + str(tm.tm_min)
+                rawImg_location = "https://" + each_data['Value']['rawImgCID'] + ".ipfs.cf-ipfs.com/"
+                resultImg_location = "https://" + each_data['Value']['resultImgCID'] + ".ipfs.cf-ipfs.com/"
+                data = {'time': time_data, 'rawImg': rawImg_location,
+                        'resultImg': resultImg_location}
+                data_list.append(data)
+
+        else:
+            error = "해쉬가 환자 정보와 일치하지 않습니다."
+        if error is None:
+            return render_template('act/showResult.html', data_list=data_list)
+        flash(error)
     return render_template('act/search.html', form=form)
 
 @bp.route('/upload/', methods=('GET','POST'))
@@ -29,7 +108,26 @@ def upload():
         image = form.image.data
         # image_length = image.content_length   #   This is 0.
         image_file = image.read()
+        patientHash = form.hash.data
         encoded_file = base64.b64encode(image_file)
+
+        apiURL = 'http://117.16.137.75:3000//doctor/uploadPatientData'
+        data = {
+            'doctorNumber': g.user.doctorNumber,
+            'patientHash': patientHash
+        }
+        response = requests.post(apiURL, data=data)
+
+        data_list = []
+        res = sorted(json.loads(response), key=lambda x: -(x['Timestamp']['seconds']['low']))
+        for each_data in res:
+            tm = time.localtime(each_data['Timestamp']['seconds']['low'])
+            time_data = {'year': tm.tm_year, 'month': tm.tm_mon, 'day': tm.tm_mday, 'hour': tm.tm_hour,
+                         'minute': tm.tm_min}
+            data = {'time': time_data, 'rawImgCID': each_data['Value']['rawImgCID'],
+                    'resultImgCID': each_data['Value']['resultImgCID']}
+            data_list.append(data)
+        return render_template('act/showResult.html', data_list=data_list)
 
     return render_template('act/upload.html', form=form)
 

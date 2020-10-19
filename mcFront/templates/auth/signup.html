@@ -19,6 +19,11 @@
             <input type="password" class="form-control" name="passwordChker" id="passwordChker"
                    value="{{ form.passwordChker.data or '' }}">
         </div>
+        <div class="form-group">
+            <label for="patientHash">해쉬 (주민번호)</label>
+            <input type="text" class="form-control" name="patientHash" id="patientHash"
+                   value="{{ form.patientHash.data or '' }}">
+        </div>
         <button type="submit" class="btn btn-primary">생성하기</button>
     </form>
 </div>

@@ -17,7 +17,8 @@ def signup():
         patientUser = Patient.query.filter_by(patientName=form.patientName.data).first()
         if not patientUser:
             patientUser = Patient(patientName=form.patientName.data,
-                                  password=generate_password_hash(form.password.data))
+                                  password=generate_password_hash(form.password.data),
+                                  patientHash=form.patientHash.data)
             db.session.add(patientUser)
             db.session.commit()
             return redirect(url_for('main.index'))
@@ -93,6 +94,9 @@ def load_logged_in_user():
             g.user = Doctor.query.get(user_id)
         else:
             g.user = Patient.query.get(user_id)
+    # print(g.user.patientName)
+    # print(g.user.hash)
+
 
 def login_required(view):
     @functools.wraps(view)

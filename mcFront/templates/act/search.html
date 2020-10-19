@@ -14,10 +14,11 @@
             <div class="col-md-8 order-md-2 mb-4">
                 <form method="post" class="post-form my-3">
                     {{ form.csrf_token }}
+                    {% include "form_errors.html" %}
                     <div class="form-group">
-                        <label for="hash">해쉬</label>
-                        <input type="text" class="form-control" name="hash" id="hash"
-                                value="{{ form.hash.data or '' }}">
+                        <label for="patientHash">해쉬</label>
+                        <input type="text" class="form-control" name="patientHash" id="patientHash"
+                                value="{{ form.patientHash.data or '' }}">
                     </div>
                     <button type="submit" class="btn btn-primary">조회하기</button>
                 </form>

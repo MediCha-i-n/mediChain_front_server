@@ -1,5 +1,5 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, TextAreaField, PasswordField
+from wtforms import StringField, TextAreaField, PasswordField, IntegerField
 from wtforms.validators import DataRequired, Length, EqualTo
 
 class PatientUserCreateForm(FlaskForm):
@@ -8,6 +8,7 @@ class PatientUserCreateForm(FlaskForm):
         DataRequired(), EqualTo('passwordChker', '비밀번호가 일치하지 않습니다.')
     ])
     passwordChker = PasswordField('비밀 번호 확인', validators=[DataRequired()])
+    patientHash = StringField('환자 해쉬', validators=[DataRequired(), Length(13)])
 
 class DoctorUserCreateForm(FlaskForm):
     doctorNumber = StringField('의사 번호', validators=[DataRequired()])
@@ -27,6 +28,7 @@ class DoctorUserLoginForm(FlaskForm):
 
 class ActUploadForm(FlaskForm):
     image = StringField('image', validators=[DataRequired()])
+    patientHash = StringField('hash', validators=[DataRequired()])
 
 class ActSearchForm(FlaskForm):
-    hash = StringField('hash', validators=[DataRequired()])
+    patientHash = StringField('hash', validators=[DataRequired()])

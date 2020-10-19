@@ -7,6 +7,7 @@ class Patient(db.Model):
     patientName = db.Column(db.String(150), unique=True, nullable=False)
     password = db.Column(db.String(200), nullable=False)
     docAuth = db.Column(db.Integer, nullable=False, server_default='0')
+    patientHash = db.Column(db.String(200), nullable=False)
 
 class Doctor(db.Model):
     # id is only needed in db
