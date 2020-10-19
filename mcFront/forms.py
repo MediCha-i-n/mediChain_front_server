@@ -28,7 +28,7 @@ class DoctorUserLoginForm(FlaskForm):
 
 class ActUploadForm(FlaskForm):
     image = StringField('image', validators=[DataRequired()])
-    patientHash = StringField('hash', validators=[DataRequired()])
+    patientHash = StringField('patientHash', validators=[DataRequired()])
 
 class ActSearchForm(FlaskForm):
-    patientHash = StringField('hash', validators=[DataRequired()])
+    patientHash = StringField('patientHash', validators=[DataRequired()])
