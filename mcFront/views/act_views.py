@@ -6,6 +6,8 @@ import base64
 import requests
 import time
 import json
+import ipfsApi
+import os
 
 from mcFront import db
 from mcFront.model import Patient, Doctor
@@ -20,7 +22,7 @@ def search():
     form = ActSearchForm()
     error = None
     if request.method == 'POST' and form.validate_on_submit():
-        patientHash = form.hash.data
+        patientHash = form.patientHash.data
         if g.user.docAuth or g.user.patientHash == patientHash:
             apiURL = ''
             if g.user.docAuth:
@@ -108,25 +110,43 @@ def upload():
         image = form.image.data
         # image_length = image.content_length   #   This is 0.
         image_file = image.read()
-        patientHash = form.hash.data
+        patientHash = form.patientHash.data
         encoded_file = base64.b64encode(image_file)
+        # print(encoded_file)
 
-        apiURL = 'http://117.16.137.75:3000//doctor/uploadPatientData'
+        ### File upload to IPFS ###
+        tmp_file_name = str(g.user.doctorNumber)+".jpg"
+        with open(tmp_file_name, "wb") as tmp_file:
+            tmp_file.write(base64.b64decode(encoded_file))
+        ipfs_api = ipfsApi.Client("127.0.0.1", 5001)
+        ipfs_response = ipfs_api.add(tmp_file_name)
+        img_cid = ipfs_response["Hash"]
+        os.remove(tmp_file_name)
+        # print(img_cid)
+        ###########################
+
+        apiURL = 'http://117.16.137.75:3000/doctor/uploadPatientData'
         data = {
-            'doctorNumber': g.user.doctorNumber,
-            'patientHash': patientHash
+            "doctorNumber": g.user.doctorNumber,
+            "patientHash": patientHash,
+            "rawImgCID": img_cid,
+            #####     TEST CODE   ########
+            "resultImgCID": img_cid,
         }
         response = requests.post(apiURL, data=data)
-
+        print("Response Type: ", type(response))
+        print("Response: ", response)
+        print("Response Headers: ", response.headers)
+        print("Response Text: ", response.text)
         data_list = []
-        res = sorted(json.loads(response), key=lambda x: -(x['Timestamp']['seconds']['low']))
-        for each_data in res:
-            tm = time.localtime(each_data['Timestamp']['seconds']['low'])
-            time_data = {'year': tm.tm_year, 'month': tm.tm_mon, 'day': tm.tm_mday, 'hour': tm.tm_hour,
-                         'minute': tm.tm_min}
-            data = {'time': time_data, 'rawImgCID': each_data['Value']['rawImgCID'],
-                    'resultImgCID': each_data['Value']['resultImgCID']}
-            data_list.append(data)
+        # res = sorted(json.loads(response.text), key=lambda x: -(x['Timestamp']['seconds']['low']))
+        # for each_data in res:
+        #     tm = time.localtime(each_data['Timestamp']['seconds']['low'])
+        #     time_data = {'year': tm.tm_year, 'month': tm.tm_mon, 'day': tm.tm_mday, 'hour': tm.tm_hour,
+        #                  'minute': tm.tm_min}
+        #     data = {'time': time_data, 'rawImgCID': each_data['Value']['rawImgCID'],
+        #             'resultImgCID': each_data['Value']['resultImgCID']}
+        #     data_list.append(data)
         return render_template('act/showResult.html', data_list=data_list)
 
     return render_template('act/upload.html', form=form)
