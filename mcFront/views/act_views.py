@@ -30,70 +30,77 @@ def search():
             else:
                 apiURL = 'http://117.16.137.75:3000/patient/getMyData/trainer'
             params = {'patientHash': patientHash}
-            # response = requests.get(apiURL, params=params)
+            response = requests.get(apiURL, params=params)
 
 ##################################################################################################################
 ##################################################################################################################
 
-            response = '''[
-             {
-                "TxId": "dd6d392f350e74a027fed8fdf68e88802dea590ec6db33990ca7e423ba594c51",
-                "Timestamp": {
-                    "seconds": { "low": 1600792773, "high": 0, "unsigned": "false" },
-                    "nanos": 449000000
-                },
-                "Value": {
-                    "doctorNumber": "0",
-                    "enrollNumber": 179,
-                    "patientHash": "trainer 3",
-                    "rawImgCID": "bafybeihpi4cthvkkh7x6oy3ozxo3x6w46iyazn5u4wrxjiy2twxywkraly",
-                    "resultImgCID": "bafybeihpi4cthvkkh7x6oy3ozxo3x6w46iyazn5u4wrxjiy2twxywkraly"
-                }
-              },
-              {
-                "Timestamp": {
-                    "seconds": { "low": 1600792890, "high": 0, "unsigned": "false" },
-                    "nanos": 449000000
-                },
-                "Value": {
-                  "doctorID": "doctor",
-                  "enrollNumber": 2,
-                  "patientHash": "patientHash1",
-                  "rawImgCID": "bafybeihpi4cthvkkh7x6oy3ozxo3x6w46iyazn5u4wrxjiy2twxywkraly",
-                  "resultImgCID": "bafybeihpi4cthvkkh7x6oy3ozxo3x6w46iyazn5u4wrxjiy2twxywkraly"
-                }
-              },
-              {
-                "Timestamp": {
-                    "seconds": { "low": 1608799999, "high": 0, "unsigned": "false" },
-                    "nanos": 449000000
-                },
-                "Value": {
-                  "patientHash": "patientHash1",
-                  "enrollNumber": 1,
-                  "doctorID": "doctor",
-                  "rawImgCID": "bafybeihpi4cthvkkh7x6oy3ozxo3x6w46iyazn5u4wrxjiy2twxywkraly",
-                  "resultImgCID": "bafybeihpi4cthvkkh7x6oy3ozxo3x6w46iyazn5u4wrxjiy2twxywkraly"
-                }
-              }
-            ]
-            '''
+            # response = '''[
+            #  {
+            #     "TxId": "dd6d392f350e74a027fed8fdf68e88802dea590ec6db33990ca7e423ba594c51",
+            #     "Timestamp": {
+            #         "seconds": { "low": 1600792773, "high": 0, "unsigned": "false" },
+            #         "nanos": 449000000
+            #     },
+            #     "Value": {
+            #         "doctorNumber": "0",
+            #         "enrollNumber": 179,
+            #         "patientHash": "trainer 3",
+            #         "rawImgCID": "bafybeihpi4cthvkkh7x6oy3ozxo3x6w46iyazn5u4wrxjiy2twxywkraly",
+            #         "resultImgCID": "bafybeihpi4cthvkkh7x6oy3ozxo3x6w46iyazn5u4wrxjiy2twxywkraly"
+            #     }
+            #   },
+            #   {
+            #     "Timestamp": {
+            #         "seconds": { "low": 1600792890, "high": 0, "unsigned": "false" },
+            #         "nanos": 449000000
+            #     },
+            #     "Value": {
+            #       "doctorID": "doctor",
+            #       "enrollNumber": 2,
+            #       "patientHash": "patientHash1",
+            #       "rawImgCID": "bafybeihpi4cthvkkh7x6oy3ozxo3x6w46iyazn5u4wrxjiy2twxywkraly",
+            #       "resultImgCID": "bafybeihpi4cthvkkh7x6oy3ozxo3x6w46iyazn5u4wrxjiy2twxywkraly"
+            #     }
+            #   },
+            #   {
+            #     "Timestamp": {
+            #         "seconds": { "low": 1608799999, "high": 0, "unsigned": "false" },
+            #         "nanos": 449000000
+            #     },
+            #     "Value": {
+            #       "patientHash": "patientHash1",
+            #       "enrollNumber": 1,
+            #       "doctorID": "doctor",
+            #       "rawImgCID": "bafybeihpi4cthvkkh7x6oy3ozxo3x6w46iyazn5u4wrxjiy2twxywkraly",
+            #       "resultImgCID": "bafybeihpi4cthvkkh7x6oy3ozxo3x6w46iyazn5u4wrxjiy2twxywkraly"
+            #     }
+            #   }
+            # ]
+            # '''
 
 ##################################################################################################################
 ##################################################################################################################
 
+            # print("Response Type: ", type(response))
+            # print("Response: ", response)
+            # print("Response Headers: ", response.headers)
+            # print("Response Text: ", response.text)
             data_list = []
-            res = sorted(json.loads(response), key=lambda x: -(x['Timestamp']['seconds']['low']))
-            for each_data in res:
-                tm = time.localtime(each_data['Timestamp']['seconds']['low'])
-                # time_data = {'year': tm.tm_year, 'month': tm.tm_mon, 'day': tm.tm_mday, 'hour': tm.tm_hour,
-                #              'minute': tm.tm_min}
-                time_data = str(tm.tm_year) + '.' + str(tm.tm_mon) + '.' + str(tm.tm_mday) + ' / ' + str(tm.tm_hour) + ':' + str(tm.tm_min)
-                rawImg_location = "https://" + each_data['Value']['rawImgCID'] + ".ipfs.cf-ipfs.com/"
-                resultImg_location = "https://" + each_data['Value']['resultImgCID'] + ".ipfs.cf-ipfs.com/"
-                data = {'time': time_data, 'rawImg': rawImg_location,
-                        'resultImg': resultImg_location}
-                data_list.append(data)
+            json_res = json.loads(response.text)
+            if "message" in json_res and json_res["message"] == "Not exist patientHash":
+                error = "등록되지 않은 해쉬입니다."
+            else:
+                res = sorted(json_res, key=lambda x: -(x['Timestamp']['seconds']['low']))
+                # res = sorted(response.json(), key=lambda x: -(x['Timestamp']['seconds']['low']))
+                for each_data in res:
+                    tm = time.localtime(each_data['Timestamp']['seconds']['low'])
+                    time_data = str(tm.tm_year) + '.' + str(tm.tm_mon) + '.' + str(tm.tm_mday) + ' / ' + str(tm.tm_hour) + ':' + str(tm.tm_min)
+                    rawImg_location = "https://" + each_data['Value']['rawImgCID'] + ".ipfs.cf-ipfs.com/"
+                    resultImg_location = "https://" + each_data['Value']['resultImgCID'] + ".ipfs.cf-ipfs.com/"
+                    data = {'time': time_data, 'rawImg': rawImg_location,
+                            'resultImg': resultImg_location}
+                    data_list.append(data)
 
         else:
             error = "해쉬가 환자 정보와 일치하지 않습니다."
@@ -131,13 +138,13 @@ def upload():
             "patientHash": patientHash,
             "rawImgCID": img_cid,
             #####     TEST CODE   ########
-            "resultImgCID": img_cid,
+            "resultImgCID": "",
         }
         response = requests.post(apiURL, data=data)
-        print("Response Type: ", type(response))
-        print("Response: ", response)
-        print("Response Headers: ", response.headers)
-        print("Response Text: ", response.text)
+        # print("Response Type: ", type(response))
+        # print("Response: ", response)
+        # print("Response Headers: ", response.headers)
+        # print("Response Text: ", response.text)
         data_list = []
         # res = sorted(json.loads(response.text), key=lambda x: -(x['Timestamp']['seconds']['low']))
         # for each_data in res:
