@@ -8,6 +8,7 @@ import time
 import json
 import ipfsApi
 import os
+import hashlib
 
 from mcFront import db
 from mcFront.model import Patient, Doctor
@@ -117,7 +118,9 @@ def upload():
         image = form.image.data
         # image_length = image.content_length   #   This is 0.
         image_file = image.read()
-        patientHash = form.patientHash.data
+        sha256_hash = hashlib.sha256(form.patientHash.data.encode())
+        patientHash = sha256_hash
+        # print(patientHash)
         encoded_file = base64.b64encode(image_file)
         # print(encoded_file)
 
