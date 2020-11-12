@@ -7,6 +7,7 @@ import requests
 import time
 import json
 import ipfsApi
+import ipfshttpclient
 import os
 import hashlib
 
@@ -14,6 +15,7 @@ from mcFront import db
 from mcFront.model import Patient, Doctor
 from mcFront.forms import ActSearchForm, ActUploadForm
 from ..views.auth_views import login_required, docLogin_required
+from ..urls import blockchain_api_url
 
 bp = Blueprint('act', __name__, url_prefix='/act')
 
@@ -25,11 +27,12 @@ def search():
     if request.method == 'POST' and form.validate_on_submit():
         patientHash = form.patientHash.data
         if g.user.docAuth or g.user.patientHash == patientHash:
-            apiURL = ''
+            blockchain_url = blockchain_api_url()
             if g.user.docAuth:
-                apiURL = 'http://117.16.137.75:3000/doctor/getPatientData/trainer'
+                apiURL = blockchain_url + 'doctor/getPatientData/trainer'
+                print("This is ========", apiURL)
             else:
-                apiURL = 'http://117.16.137.75:3000/patient/getMyData/trainer'
+                apiURL = blockchain_url + 'doctor/patient/getMyData/trainer'
             params = {'patientHash': patientHash}
             response = requests.get(apiURL, params=params)
 
@@ -120,6 +123,12 @@ def upload():
         image_file = image.read()
         sha256_hash = hashlib.sha256(form.patientHash.data.encode())
         patientHash = sha256_hash
+
+        ####
+        # test_code = ipfshttpclient.connect()
+        # print(test_code.id())
+        ####
+
         # print(patientHash)
         encoded_file = base64.b64encode(image_file)
         # print(encoded_file)
@@ -132,18 +141,20 @@ def upload():
         ipfs_response = ipfs_api.add(tmp_file_name)
         img_cid = ipfs_response["Hash"]
         os.remove(tmp_file_name)
-        # print(img_cid)
+        # print(ipfs_response)
         ###########################
 
-        apiURL = 'http://117.16.137.75:3000/doctor/uploadPatientData'
-        data = {
-            "doctorNumber": g.user.doctorNumber,
-            "patientHash": patientHash,
-            "rawImgCID": img_cid,
-            #####     TEST CODE   ########
-            "resultImgCID": "",
-        }
-        response = requests.post(apiURL, data=data)
+        blockchain_url = blockchain_api_url()
+        apiURL = blockchain_url + '/doctor/uploadPatientData'
+        # data = {
+        #     "doctorNumber": g.user.doctorNumber,
+        #     "patientHash": patientHash,
+        #     "rawImgCID": img_cid,
+        #     #####     TEST CODE   ########
+        #     "resultImgCID": "",
+        # }
+        # response = requests.post(apiURL, data=data)
+
         # print("Response Type: ", type(response))
         # print("Response: ", response)
         # print("Response Headers: ", response.headers)
