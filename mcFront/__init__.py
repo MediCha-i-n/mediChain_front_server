@@ -29,9 +29,10 @@ def create_app():
     from . import model
 
     # Blueprints
-    from .views import main_views, auth_views, act_views
+    from .views import main_views, auth_views, act_views, deep_learning_views
     app.register_blueprint(main_views.bp)
     app.register_blueprint(auth_views.bp)
     app.register_blueprint(act_views.bp)
+    app.register_blueprint(deep_learning_views.bp)
 
     return app

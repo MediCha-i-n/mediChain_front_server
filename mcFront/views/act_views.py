@@ -1,7 +1,9 @@
 from flask import Blueprint, request, render_template, url_for, g, flash
 from werkzeug.utils import redirect
 from werkzeug.datastructures import FileStorage
+from PIL import Image
 import subprocess
+import numpy as np
 import base64
 import requests
 import time
@@ -15,6 +17,7 @@ from mcFront import db
 from mcFront.model import Patient, Doctor
 from mcFront.forms import ActSearchForm, ActUploadForm
 from ..views.auth_views import login_required, docLogin_required
+from ..deep_learning import predict
 from ..urls import blockchain_api_url
 
 bp = Blueprint('act', __name__, url_prefix='/act')
@@ -90,6 +93,8 @@ def search():
             # print("Response: ", response)
             # print("Response Headers: ", response.headers)
             # print("Response Text: ", response.text)
+
+
             data_list = []
             json_res = json.loads(response.text)
             if "message" in json_res and json_res["message"] == "Not exist patientHash":
@@ -129,19 +134,31 @@ def upload():
         # print(test_code.id())
         ####
 
-        # print(patientHash)
         encoded_file = base64.b64encode(image_file)
-        # print(encoded_file)
 
         ### File upload to IPFS ###
-        tmp_file_name = str(g.user.doctorNumber)+".jpg"
+        tmp_file_name = str(g.user.doctorNumber)+".tif"
         with open(tmp_file_name, "wb") as tmp_file:
             tmp_file.write(base64.b64decode(encoded_file))
+
+        ### Produce a new image from deep learning model
+        new_file_name = "new" + tmp_file_name
+        img = Image.open(tmp_file_name)
+        pixel_img = np.array(img)
+        predicted_img = predict.predict(pixel_img)
+        new_image = Image.fromarray(predicted_img)
+        new_image.save(new_file_name)
+
         ipfs_api = ipfsApi.Client("127.0.0.1", 5001)
         ipfs_response = ipfs_api.add(tmp_file_name)
+        ipfs_new_response = ipfs_api.add(new_file_name)
         img_cid = ipfs_response["Hash"]
+
+
         os.remove(tmp_file_name)
-        # print(ipfs_response)
+        os.remove(new_file_name)
+        print("ipfs response :", ipfs_response)
+        print("ipfs new response :", ipfs_new_response)
         ###########################
 
         blockchain_url = blockchain_api_url()
