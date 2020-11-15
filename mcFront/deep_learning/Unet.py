@@ -21,7 +21,7 @@ def bottlenect(x, filters, kernel_size = (3, 3), padding = 'same', kernel_initia
     c = Conv2D(filters, kernel_size, activation='relu', padding=padding)(c)
     return c
 
-def Unet(input_size = (256, 256, 3), classes = 1, wf = 5, depth = 4):
+def Unet(input_size = (256, 256, 3), classes = 1, wf = 4, depth = 4):
     inputs = Input(input_size)
     conv_stack = []
     conv, pool = down_block(inputs, 2**wf)

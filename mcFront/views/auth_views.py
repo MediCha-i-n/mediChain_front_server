@@ -6,6 +6,7 @@ from mcFront import db
 from mcFront.forms import PatientUserCreateForm, DoctorUserCreateForm, PatientUserLoginForm, DoctorUserLoginForm
 from mcFront.model import Patient, Doctor
 
+import hashlib
 import functools
 
 bp = Blueprint('auth', __name__, url_prefix='/auth')
@@ -18,7 +19,8 @@ def signup():
         if not patientUser:
             patientUser = Patient(patientName=form.patientName.data,
                                   password=generate_password_hash(form.password.data),
-                                  patientHash=form.patientHash.data)
+                                  patientHash=hashlib.sha256(form.patientHash.data.encode()).hexdigest()
+                                  )
             db.session.add(patientUser)
             db.session.commit()
             return redirect(url_for('main.index'))
